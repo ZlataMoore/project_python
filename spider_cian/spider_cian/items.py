@@ -13,3 +13,4 @@ class SpiderCianItem(scrapy.Item):
     details = scrapy.Field()
     coordinates = scrapy.Field()
     house = scrapy.Field()
+    title = scrapy.Field()

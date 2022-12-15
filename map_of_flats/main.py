@@ -1,41 +1,31 @@
-import folium
-from folium import plugins
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-from IPython.display import display, HTML
-import webbrowser
-import geocoder
-from geopy.geocoders import Nominatim
-import json
-with open('flats.json') as f:
-    flats = json.load(f)
+# -*- coding: utf-8 -*-
+import dash_leaflet as dl
+from dash import Dash, dcc, html, Input, Output, State
+from flats_to_map import flats_to_map
 
-# address we need to geocode
-loc = 'Москва,  Нижние Мнёвники,  37Б'
+app = Dash()
+app.layout = html.Div([
+    html.H1('Квартиры в Москве и МО'),
+              dcc.RadioItems(
+                id='pages',
+                options=['1-100', '101-200', '201-300',
+                         '301-500', '501-700', '701-800',
+                         '801-1000', '1001-1200', '1201-1300'],
+                value='1-100',
+                inline=True
+            ),
+    html.Iframe(id='map', srcDoc=open('map.html', 'r', encoding='utf-8').read(), width='100%', height='600')
+])
+@app.callback(
+    Output("map", "srcDoc"),
+    Input("pages", "value"))
+def display_choropleth(pages):
+    flats_to_map(str(pages))
 
-# making an instance of Nominatim class
-geolocator = Nominatim(user_agent="my_request")
+    fig = open('map.html', 'r', encoding='utf-8').read()
 
-# applying geocode method to get the location
-location = geolocator.geocode(loc)
-map = folium.Map(
-    location = [55.753300, 37.624239],    # широта и долгота России
-    zoom_start = 10
-)
-# printing address and coordinates
-print(location.address)
-print((location.latitude, location.longitude))
+    return fig
 
-for flat in flats:
-    if flat['coordinates']:
-        folium.Marker(
-              location=flat['coordinates'],
-              popup=flat['address'],
-           ).add_to(map)
+if __name__ == '__main__':
+    app.run_server()
 
-#g = geocoder.yandex('Moscow Russia')
-
-map.save(r'C:\Users\Zlata\PycharmProjects\map_of_flats\map.html')
-#display(russia_map)
-webbrowser.open('map.html')
