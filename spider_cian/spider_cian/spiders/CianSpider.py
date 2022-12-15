@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import scrapy
-from numpy import unicode
-import numpy
-
 from ..items import SpiderCianItem
 import re
 from urllib.parse import urlencode
@@ -32,9 +29,9 @@ class CianspiderSpider(scrapy.Spider):
         #yield scrapy.Request(url=page, callback=self.parse_page)
 
         page_ = page[:-1]
-        page = page_ + str(40)
-        i = 40
-        while i <= 50:
+        page = page_ + str(1201)
+        i = 1201
+        while i <= 1300:
             i += 1
             yield scrapy.Request(url=page, callback=self.parse_page)
             page = page_ + str(i)
@@ -89,15 +86,33 @@ class CianspiderSpider(scrapy.Spider):
                                  '/*[@itemprop="price"]'
                                  '/text()').extract()
 
-        details = response.xpath('//*[@class="b-dotted-block__container"]'
-                                 '/*[@class="b-dotted-block__col"]'
-                                 '/*[@class="b-dotted-block"]'
-                                 '/*[@class="b-dotted-block__right"]'
-                                 '/*[@class="b-dotted-block__inner"]'
-                                 '/text()').extract()
+        title = response.xpath('//*[@id="container"]'
+                                       '//*[@class="page__container"]'
+                                       '/*[@class="page__content js-parallax-content"]'
+                                       '/*[@itemtype="https://schema.org/Product"]'
+                                       '/*[@class="page__row top-row"]'
+                                       '/*[@class="page__row-inner"]'
+                                       '/*[@class="title-block"]'
+                                       '/*[@class="title"]'
+                                       '/*[@itemprop="name"]'
+                                       '/text()').extract()
+        title_premium = response.xpath('//*[@id="container"]'
+                                       '//*[@class="page__container"]'
+                                       '/*[@class="page__content js-parallax-content"]'
+                                       '/*[@itemtype="https://schema.org/Product"]'
+                                       '/*[@class="page__row top-row"]'
+                                       '/*[@class="page__row-inner"]'
+                                       '/*[@class="title-block premium"]'
+                                       '/*[@class="title"]'
+                                       '/*[@itemprop="name"]'
+                                       '/text()').extract()
 
-
-
+        if title:
+            title = title[0].replace(u'\xa0', u' ')
+            item['title'] = title
+        else:
+            title = title_premium[0].replace(u'\xa0', u' ')
+            item['title'] = title
         nums = re.findall(r'\d+', cost[0])
         cost = ''.join(nums)
         item['cost'] = cost
