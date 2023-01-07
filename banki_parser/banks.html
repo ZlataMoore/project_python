@@ -1,0 +1,18 @@
+<header><meta charset=UTF-8"></header>
+<body>
+  {% if banks %}
+  <ul style="margin: 0; padding: 4px;">
+    {% for bank in banks %}
+    <li style="display: inline-block; margin: 10px; padding: 5px; background-color: #CDCDCD; border-radius: 5px;">
+        <h3>{{ bank['bank'] }}</h3>
+        <p><b>Период</b>: {{ bank['period'] }}</p>
+        <p><b>Ставка</b>: {{ bank['mortgage_rate'] }} %</p>
+        <p><b>Плата</b>: {{ bank['payment_per_mouth'] }} ₽</p>
+        <p><b>Сумма переплаты</b>: {{ bank['overpayment'] }} ₽</p>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <h1>По вашему запросу не найденно ни одной ипотеки</h1>
+  {% endif %}
+</body>
